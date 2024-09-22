@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  frontend_api:
+    build: ./frontend_api
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      - DATABASE_URL=postgres://user:password@postgres/frontend_db
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq/
+
+  backend_api:
+    build: ./backend_api
+    ports:
+      - "8001:8001"
+    depends_on:
+      - mongodb
+      - rabbitmq
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017/admin_db
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq/
+
+  postgres:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=frontend_db
+
+  mongodb:
+    image: mongo:4.4
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
